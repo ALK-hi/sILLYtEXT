@@ -1,16 +1,17 @@
+
 import * as React from "react";
 import { toolMap, isValidToolId, ToolId } from "@/lib/tools";
 import { notFound } from "next/navigation";
 import { ToolClientPage } from "./tool-client-page";
 
 interface ToolPageProps {
-  params: {
+  params: Promise<{
     tool: ToolId;
-  };
+  }>;
 }
 
-export default function ToolPage({ params }: ToolPageProps) {
-  const { tool: toolId } = params;
+export default async function ToolPage({ params }: ToolPageProps) {
+  const { tool: toolId } = await params;
 
   if (!isValidToolId(toolId)) {
     notFound();
@@ -31,8 +32,9 @@ export async function generateStaticParams() {
   }));
 }
 
-export function generateMetadata({ params }: ToolPageProps) {
-  const tool = toolMap.get(params.tool);
+export async function generateMetadata({ params }: ToolPageProps) {
+  const { tool: toolId } = await params;
+  const tool = toolMap.get(toolId);
   if (!tool) {
     return {
       title: "Tool not found",
